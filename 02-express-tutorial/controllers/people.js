@@ -5,7 +5,7 @@ let people = [
 ];
 
 //const { people } = require('../data');
-
+//Making small change so I can create new PR
 const getPeople = (req, res) => {
     res.status(200).json(people);  // Return all people
 };
