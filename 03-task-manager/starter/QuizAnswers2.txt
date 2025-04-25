@@ -1,0 +1,14 @@
+Q1. Why did we create a middleware called asyncWrapper?
+Ans: We created asyncWrapper to avoid repeating try/catch blocks in every asynchronous route handler. 
+     It wraps async functions and forwards any errors to the global error-handling middleware using next(),
+     making the code cleaner and more maintainable.
+
+Q2. Complete the code for getTask with error handling:
+Ans: const getTask = asyncWrapper(async (req, res, next) => {
+     const { id: taskID } = req.params;
+     const task = await Task.findOne({ _id: taskID });
+     if (!task) {
+        return next(new CustomAPIError(`No task with id: ${taskID}`, 404));
+     }
+     res.status(200).json({ task });
+    });

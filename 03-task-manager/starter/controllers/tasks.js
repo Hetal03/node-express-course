@@ -1,6 +1,9 @@
 const Task = require('../models/task');
 
-// Get all tasks
+const asyncWrapper = require('../middleware/async');
+const { createCustomError } = require('../errors/custom-error');
+/* 
+// Get all tasks  weeek 5 with try cath
 const getAllTasks = async (req, res) => {
   try {
     const tasks = await Task.find({});
@@ -9,8 +12,15 @@ const getAllTasks = async (req, res) => {
     res.status(500).json({ msg: error.message });
   }
 };
+ */
 
-// Create a new task
+// ✅ GET all tasks week 6 wiyj await
+const getAllTasks = asyncWrapper(async (req, res) => {
+  const tasks = await Task.find({});
+  res.status(200).json({ tasks });
+});
+
+/* // Create a new task  week 5 
 const createTask = async (req, res) => {
   try {
     const task = await Task.create(req.body);
@@ -18,10 +28,19 @@ const createTask = async (req, res) => {
   } catch (error) {
     res.status(500).json({ msg: error.message });
   }
-};
+}; */
+
+// ✅ CREATE task
+const createTask = asyncWrapper(async (req, res) => {
+  const task = await Task.create(req.body);
+  res.status(201).json({ task });
+});
+
+
 
 // Get a single task by ID
-const getTask = async (req, res) => {
+/* old code for week 5 
+  const getTask = async (req, res) => {
   try {
     const { id: taskID } = req.params;
     const task = await Task.findById(taskID);
@@ -32,9 +51,23 @@ const getTask = async (req, res) => {
   } catch (error) {
     res.status(500).json({ msg: error.message });
   }
-};
+}; */
 
-// Update a task
+
+//new code for week 6
+
+const getTask = asyncWrapper(async (req, res, next) => {
+  const { id: taskID } = req.params;
+  const task = await Task.findOne({ _id: taskID });
+  if (!task) {
+    return next(createCustomError(`No task with id: ${taskID}`, 404));
+  }
+  res.status(200).json({ task });
+});
+
+/* 
+
+// Update a task week 5
 const updateTask = async (req, res) => {
   try {
     const { id: taskID } = req.params;
@@ -49,9 +82,29 @@ const updateTask = async (req, res) => {
   } catch (error) {
     res.status(500).json({ msg: error.message });
   }
-};
+}; */
 
-// Delete a task
+
+
+// ✅ UPDATE task (PUT/PATCH)
+const updateTask = asyncWrapper(async (req, res, next) => {
+  const { id: taskID } = req.params;
+
+  const task = await Task.findOneAndUpdate({ _id: taskID }, req.body, {
+    new: true,
+    runValidators: true,
+  });
+
+  if (!task) {
+    return next(createCustomError(`No task with id: ${taskID}`, 404));
+  }
+
+  res.status(200).json({ task });
+});
+
+
+
+/* // Delete a task week 5
 const deleteTask = async (req, res) => {
   try {
     const { id: taskID } = req.params;
@@ -63,7 +116,19 @@ const deleteTask = async (req, res) => {
   } catch (error) {
     res.status(500).json({ msg: error.message });
   }
-};
+}; */
+// ✅ DELETE task week 6
+const deleteTask = asyncWrapper(async (req, res, next) => {
+  const { id: taskID } = req.params;
+  const task = await Task.findOneAndDelete({ _id: taskID });
+
+  if (!task) {
+    return next(createCustomError(`No task with id: ${taskID}`, 404));
+  }
+
+  res.status(200).json({ task });
+});
+
 
 module.exports = {
   getAllTasks,

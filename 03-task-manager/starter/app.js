@@ -7,6 +7,9 @@ const connectDB = require('./db/connect');
 
 const mongoose = require('mongoose');
 
+const errorHandlerMiddleware = require('./middleware/error-handler');
+const notFound = require('./middleware/not-found');
+
 // Use the Mongo URI from the .env file
 const MONGO_URI = process.env.MONGO_URI;
 
@@ -21,8 +24,14 @@ mongoose.connect(MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true })
 // middleware
 app.use(express.json());
 
+
+
+
 // routes
 app.use('/api/v1/tasks', tasks);
+
+app.use(notFound);
+app.use(errorHandlerMiddleware);
 
 const port = process.env.PORT || 3000;
 
