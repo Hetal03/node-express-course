@@ -1,10 +1,9 @@
 const express = require('express');
 const router = express.Router();
-
-const { login, dashboard } = require('../controllers/main');
 const authMiddleware = require('../middleware/auth');
 
-router.post('/login', login);
-router.get('/dashboard', authMiddleware, dashboard);
+router.get('/dashboard', authMiddleware, (req, res) => {
+  res.status(200).json({ msg: `Hello, ${req.user.username}` });
+});
 
 module.exports = router;
